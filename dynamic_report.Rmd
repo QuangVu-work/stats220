@@ -1,0 +1,71 @@
+---
+title: My dynamic report
+output: html_fragment
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo=FALSE, message=FALSE, warning=FALSE, error=FALSE)
+
+```
+
+```{css}
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: #f4f7fc;
+    color: #333;
+    margin: 0;
+    padding: 20px;
+}
+
+h2 {
+    text-align: center;
+    color: #2c3e50;
+    font-size: 24px;
+}
+```
+
+## Observational Logging of Phone Checking Behaviour
+
+Using a designed survey, I recorded information about each time I checked my phone. The collected data reveals insights about the purpose of checking, screen time, distraction patterns and the impact of notifications.
+
+```{r}
+library(tidyverse)
+
+logged_data <- read_csv("https://docs.google.com/spreadsheets/d/e/2PACX-1vQMjGhy5aXOstY_APwzqO0mLl79bJ8_ruF33EFXWQrGkQLVtLILHdMHacXDgj26l94s_LiHdnC3mYOj/pub?output=csv") %>%
+  rename(primary_reason = 2,
+          notification = 3,
+          screen_time = 4,
+          distracted = 5)
+
+latest_data <- logged_data %>%
+  select(primary_reason, notification, screen_time, distracted)
+
+mean_screen_time <- mean(latest_data$screen_time)
+
+max_screen_time <- max(latest_data$screen_time)
+ 
+```
+
+Throughout the case study, I spent an average of `r mean_screen_time` minutes per instance of phone use. On one occasion, screen time extended to a maximum of `r max_screen_time` minutes following a single phone check.
+
+The graph below indicates how notifications could affect the phone checking behaviours.
+
+```{r}
+ggplot(data = latest_data) +
+  geom_bar(aes(x = notification), fill = "#00CED1") +
+  labs(title = "The Role of Notifications in Phone Checking",
+       subtitle = "Examining whether phone checking was initiated by notifications",
+       x = "Notification",
+       y = "Times checking the phone")
+```
+
+Further, the analysis suggests the patterns of distraction as regards the purposes of checking the phone.
+
+```{r}
+ggplot(data = latest_data) +
+  geom_bar(aes(y = primary_reason, fill = distracted)) +
+  labs(title = "Reasons for Phone Checking and Distraction Patterns",
+       subtitle = "Examining whether the user focussed on the main reason or got sidetracked",
+       x = "Times checking the phone",
+       y = "The primary reason")
+```
